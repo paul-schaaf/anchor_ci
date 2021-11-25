@@ -18,24 +18,23 @@ jobs:
       matrix:
         node:
           - cmd: pushd client/example && ./run-test.sh && popd
-            name: client
-            nocache: true
+            path: client/example
           - cmd: pushd tests/sysvars && anchor test && popd
-            name: sysvars
+            path: tests/sysvars
           - cmd: pushd tests/composite && anchor test && popd
-            name: composite
+            path: tests/composite
           - cmd: pushd tests/errors && anchor test && popd
-            name: errors
+            path: tests/errors
           - cmd: pushd tests/spl/token-proxy && anchor test && popd
-            name: spl/token-proxy
+            path: spl/token-proxy
           - cmd: pushd tests/multisig && anchor test && popd
-            name: multisig
+            path: tests/multisig
           - cmd: pushd tests/interface && anchor test && popd
-            name: interface
+            path: tests/interface
           - cmd: pushd tests/lockup && anchor test && popd
-            name: lockup
+            path: tests/lockup
           - cmd: pushd tests/permissioned-markets/deps/serum-dex/dex && cargo build-bpf && cd ../../../ && anchor test && popd
-            name: permissioned-markets
+            path: tests/permissioned-markets
     steps:
       - uses: actions/checkout@v2
       - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
@@ -87,12 +86,11 @@ jobs:
       - run: cargo install --path cli anchor-cli --locked --force
 
       - uses: actions/cache@v2
-        name: Cache ${{ matrix.node.name }} target
-        if: ${{ matrix.node.nocache }} == ""
+        name: Cache ${{ matrix.node.path }} target
         id: cache-test-target
         with:
-          path: tests/${{ matrix.node.name }}/target
-          key: cargo-${{ runner.os }}-v0000-${{ matrix.node.name }}-${{ env.ANCHOR_VERSION }}
+          path: ${{ matrix.node.path }}/target
+          key: cargo-${{ runner.os }}-v0000-${{ matrix.node.path }}-${{ env.ANCHOR_VERSION }}
       
       - run: ${{ matrix.node.cmd }}
-        name: ${{ matrix.node.name }} program test
+        name: ${{ matrix.node.path }} program test
