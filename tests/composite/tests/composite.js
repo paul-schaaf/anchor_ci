@@ -7,7 +7,7 @@ describe("composite", () => {
   // Configure the client to use the local cluster.
   anchor.setProvider(provider);
 
-  it("Is initialized!", async () => {
+  it("Is initialized   !", async () => {
     const program = anchor.workspace.Composite;
 
     const dummyA = anchor.web3.Keypair.generate();
