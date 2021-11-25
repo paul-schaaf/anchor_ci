@@ -10,11 +10,12 @@ on:
 env: 
   SOLANA_CLI_VERSION: 1.8.0
   NODE_VERSION: 17.0.1
+  OS_VERSION: ubuntu-18.04
 
 jobs:
   test-core:
     name: Core Tests
-    runs-on: ubuntu-18.04
+    runs-on: ${{ env.OS_VERSION }}
     steps:
       - run: rustup component add rustfmt clippy
       - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
@@ -42,9 +43,60 @@ jobs:
       - run: pushd ts && yarn && popd
       - run: pushd ts && yarn test && popd
       - run: pushd ts && yarn lint && popd
+
+  setup-client-example:
+    name: Setup Client Example Test
+    runs-on: ${{ env.OS_VERSION }}
+    strategy:
+      matrix:
+        node:
+          - path: tests/events
+            name: events.so
+          - path: examples/tutorial/basic-4/
+            name: basic_4.so
+          - path: examples/tutorial/basic-2/
+            name: basic_2.so
+          - path: tests/composite/
+            name: composite.so
+    steps:
+      - run: pushd ${{ matrix.node.path }} && anchor build && popd
+      - uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.node.name }}
+          path: ${{ matrix.node.path }}/target/deploy${{ matrix.node.name }}
+  
+  test-client-example:
+    needs: setup-client-example
+    name: Client Example Test
+    runs-on: ${{ env.OS_VERSION }}
+    steps:
+      - uses: actions/download-artifact@v2
+        with:
+          name: events.so
+          path: tests/events/target/deploy/
+      - uses: actions/download-artifact@v2
+        with:
+          name: basic_4.so
+          path: examples/tutorial/basic-4/target/deploy/
+      - uses: actions/download-artifact@v2
+        with:
+          name: basic_2.so
+          path: examples/tutorial/basic-2/target/deploy/
+      - uses: actions/download-artifact@v2
+        with:
+          name: composite.so
+          path: tests/composite/target/deploy/
+      - uses: actions/cache@v2
+        name: Cache client/example target
+        id: cache-test-target
+        with:
+          path: client/example/target
+          key: cargo-${{ runner.os }}-v0000-client/example-${{ env.ANCHOR_VERSION }}
+      - run: pushd client/example && ./run-test.sh && popd
+
   setup-program-tests:
     name: Setup Program Tests
-    runs-on: ubuntu-18.04
+    runs-on: ${{ env.OS_VERSION }}
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install -y pkg-config build-essential libudev-dev
@@ -65,15 +117,13 @@ jobs:
           name: anchor-binary
           path: ~/.cargo/bin/anchor
 
-  test:
+  test-programs:
     needs: setup-program-tests
     name: Test ${{ matrix.node.path }}
-    runs-on: ubuntu-18.04
+    runs-on: ${{ env.OS_VERSION }}
     strategy:
       matrix:
         node:
-          - cmd: pushd client/example && ./run-test.sh && popd
-            path: client/example
           - cmd: pushd tests/sysvars && anchor test && popd
             path: tests/sysvars
           - cmd: pushd tests/composite && anchor test && popd
