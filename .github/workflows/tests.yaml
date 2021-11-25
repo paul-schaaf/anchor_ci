@@ -49,7 +49,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install -y pkg-config build-essential libudev-dev
-      - uses: ./.github/actions/setup-solana/
+      - uses: .github/actions/setup-solana/
       - uses: actions/cache@v2
         name: Cache Cargo registry + index
         id: cache-anchor
@@ -87,7 +87,7 @@ jobs:
       - run: git submodule update --init --recursive
       - run: sudo apt-get install -y pkg-config build-essential libudev-dev
 
-      - uses: ./.github/actions/setup-solana/
+      - uses: .github/actions/setup-solana/
 
       - uses: actions/download-artifact@v2
         with:
@@ -135,7 +135,7 @@ jobs:
         with:
           path: client/example/target
           key: cargo-${{ runner.os }}-v0000-client/example-${{ env.ANCHOR_VERSION }}
-      - uses: ./.github/actions/setup-solana/
+      - uses: .github/actions/setup-solana/
       - run: pushd client/example && ./run-test.sh && popd
 
   test-programs:
@@ -208,7 +208,7 @@ jobs:
       - run: cd tests && yarn link @project-serum/anchor && yarn && cd ..
       - run: sudo apt-get install -y pkg-config build-essential libudev-dev
       
-      - uses: ./.github/actions/setup-solana/
+      - uses: .github/actions/setup-solana/
 
       - uses: actions/cache@v2
         name: Cache Cargo registry + index
