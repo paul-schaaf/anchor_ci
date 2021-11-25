@@ -35,6 +35,12 @@ jobs:
             path: tests/lockup
           - cmd: pushd tests/permissioned-markets/deps/serum-dex/dex && cargo build-bpf && cd ../../../ && anchor test && popd
             path: tests/permissioned-markets
+          - cmd: pushd tests/escrow && anchor test && popd
+            path: tests/escrow
+          - cmd: pushd tests/pyth && anchor test && popd
+            path: tests/pyth
+          - cmd: pushd tests/system-accounts && anchor test && popd
+            path: tests/system-accounts
     steps:
       - uses: actions/checkout@v2
       - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
