@@ -58,6 +58,9 @@ jobs:
           - path: tests/composite/
             name: composite.so
     steps:
+      - uses: actions/checkout@v2
+      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
+      - run: git submodule update --init --recursive
       - run: pushd ${{ matrix.node.path }} && anchor build && popd
       - uses: actions/upload-artifact@v2
         with:
@@ -69,6 +72,9 @@ jobs:
     name: Client Example Test
     runs-on: ubuntu-18.04
     steps:
+      - uses: actions/checkout@v2
+      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
+      - run: git submodule update --init --recursive
       - uses: actions/download-artifact@v2
         with:
           name: events.so
