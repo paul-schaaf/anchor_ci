@@ -12,7 +12,31 @@ env:
   NODE_VERSION: 17.0.1
 
 jobs:
+  setup:
+    name: Setup Tests
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/cache@v2
+        name: Cache Cargo registry + index
+        id: cache-anchor
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./target/
+          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
+      - run: cargo install --path cli anchor-cli --locked --force
+      - uses: actions/upload-artifact@v2
+        with:
+          name: anchor-binary
+          path: ~/.cargo/bin/anchor
+
   test:
+    needs: setup
+    name: Test ${{ matrix.node.path }}
     runs-on: ubuntu-18.04
     strategy:
       matrix:
@@ -44,7 +68,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
-      - run: echo "${{ env.ANCHOR_VERSION }}"
       - run: git submodule update --init --recursive
 
       - uses: actions/setup-node@v2
@@ -89,7 +112,10 @@ jobs:
             ./target/
           key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
 
-      - run: cargo install --path cli anchor-cli --locked --force
+      - uses: actions/download-artifact@v2
+        with:
+          name: anchor-binary
+          path: ~/.cargo/bin/
 
       - uses: actions/cache@v2
         name: Cache ${{ matrix.node.path }} target
