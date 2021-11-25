@@ -65,7 +65,8 @@ jobs:
         with:
           name: anchor-binary
           path: ~/.cargo/bin/
-      - run: pushd ${{ matrix.node.path }} && sudo anchor build && popd
+      - run: chmod +rwx ~/.cargo/bin/anchor
+      - run: pushd ${{ matrix.node.path }} && anchor build && popd
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.node.name }}
