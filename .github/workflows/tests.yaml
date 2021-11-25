@@ -59,7 +59,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./target/
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo install --path cli anchor-cli --locked --force
       - uses: actions/upload-artifact@v2
         with:
@@ -85,31 +85,31 @@ jobs:
         id: cache-basic-0
         with:
           path: ./examples/tutorial/basic-0/target
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('./examples/tutorial/basic-0/**/Cargo.toml') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('./examples/tutorial/basic-0/**/Cargo.toml') }}
       - uses: actions/cache@v2
         name: basic-1 cache
         id: cache-basic-1
         with:
           path: ./examples/tutorial/basic-1/target
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('./examples/tutorial/basic-1/**/Cargo.toml') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('./examples/tutorial/basic-1/**/Cargo.toml') }}
       - uses: actions/cache@v2
         name: basic-2 cache
         id: cache-basic-2
         with:
           path: ./examples/tutorial/basic-2/target
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('./examples/tutorial/basic-2/**/Cargo.toml') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('./examples/tutorial/basic-2/**/Cargo.toml') }}
       - uses: actions/cache@v2
         name: basic-3 cache
         id: cache-basic-3
         with:
           path: ./examples/tutorial/basic-3/target
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('./examples/tutorial/basic-3/**/Cargo.toml') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('./examples/tutorial/basic-3/**/Cargo.toml') }}
       - uses: actions/cache@v2
         name: basic-4 cache
         id: cache-basic-4
         with:
           path: ./examples/tutorial/basic-4/target
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('./examples/tutorial/basic-4/**/Cargo.toml') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('./examples/tutorial/basic-4/**/Cargo.toml') }}
       - run: pushd examples/tutorial && yarn workspaces run test
 
   setup-client-example:
@@ -177,7 +177,7 @@ jobs:
         id: cache-test-target
         with:
           path: client/example/target
-          key: cargo-${{ runner.os }}-v0000-client/example-${{ env.ANCHOR_VERSION }}
+          key: cargo-${{ runner.os }}-client/example-${{ env.ANCHOR_VERSION }}
       - uses: ./.github/actions/setup-solana/
       - run: pushd client/example && ./run-test.sh && popd
 
@@ -246,7 +246,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./target/
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
 
       - uses: actions/download-artifact@v2
         with:
@@ -258,7 +258,7 @@ jobs:
         id: cache-test-target
         with:
           path: ${{ matrix.node.path }}/target
-          key: cargo-${{ runner.os }}-v0000-${{ matrix.node.path }}-${{ env.ANCHOR_VERSION }}
+          key: cargo-${{ runner.os }}-${{ matrix.node.path }}-${{ env.ANCHOR_VERSION }}
       
       - run: ${{ matrix.node.cmd }}
         name: ${{ matrix.node.path }} program test
