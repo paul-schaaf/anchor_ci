@@ -58,12 +58,30 @@ jobs:
             path: tests/lockup
           - cmd: pushd tests/permissioned-markets/deps/serum-dex/dex && cargo build-bpf && cd ../../../ && anchor test && popd
             path: tests/permissioned-markets
+          - cmd: pushd tests/swap/deps/serum-dex/dex && cargo build-bpf && cd ../../../ && anchor test && popd
+            path: tests/swap
           - cmd: pushd tests/escrow && anchor test && popd
             path: tests/escrow
           - cmd: pushd tests/pyth && anchor test && popd
             path: tests/pyth
           - cmd: pushd tests/system-accounts && anchor test && popd
             path: tests/system-accounts
+          - cmd: pushd tests/misc && anchor test && popd
+            path: tests/misc
+          - cmd: pushd tests/events && anchor test && popd
+            path: tests/events
+          - cmd: pushd tests/cashiers-check && anchor test && popd
+            path: tests/cashiers-check
+          - cmd: pushd tests/typescript && anchor test && popd
+            path: tests/typescript
+          - cmd: pushd tests/zero-copy && anchor test && popd
+            path: tests/zero-copy
+          - cmd: pushd tests/chat && anchor test && popd
+            path: tests/chat
+          - cmd: pushd tests/ido-pool && anchor test && popd
+            path: tests/ido-pool
+          - cmd: pushd tests/cfo && anchor run test-with-build && popd
+            path: tests/cfo
     steps:
       - uses: actions/checkout@v2
       - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
