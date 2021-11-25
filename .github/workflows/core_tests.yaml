@@ -17,6 +17,9 @@ jobs:
     runs-on: ubuntu-18.04
     steps:
       - run: rustup component add rustfmt clippy
+      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - run: git submodule update --init --recursive
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
@@ -28,4 +31,3 @@ jobs:
       - run: pushd ts && yarn && popd
       - run: pushd ts && yarn test && popd
       - run: pushd ts && yarn lint && popd
-      
