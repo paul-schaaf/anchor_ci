@@ -66,6 +66,15 @@ jobs:
           name: anchor-binary
           path: ~/.cargo/bin/anchor
 
+  # test-examples:
+  #   name: Examples Test
+  #   runs-on: ubuntu-18.04
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: ./.github/actions/setup/
+  #     - uses: ./.github/actions/setup-solana/
+  #     - uses: ./.github/actions/setup-ts/
+
   setup-client-example:
     needs: setup-anchor-cli
     name: Setup Client Example Test
@@ -104,6 +113,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/setup/
+      - uses: ./.github/actions/setup-ts/
 
       - uses: actions/download-artifact@v2
         with:
@@ -184,25 +194,10 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - uses: ./.github/actions/setup/
-
-      - uses: actions/setup-node@v2
-        with:
-          node-version: ${{ env.NODE_VERSION }}
+      - uses: ./.github/actions/setup-ts/
+      - uses: ./.github/actions/setup-solana/
 
       - run: rustup component add rustfmt clippy
-      - uses: actions/cache@v2
-        name: Cache Typescript node_modules
-        id: cache-typescript
-        with:
-          path: |
-            ./ts/node_modules
-          key: solana-${{ runner.os }}-v0000-${{ env.NODE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
-      - run: cd ts && yarn && yarn build && yarn link && cd ../
-      - run: cd examples/tutorial && yarn link @project-serum/anchor && yarn && cd ../../
-      - run: cd tests && yarn link @project-serum/anchor && yarn && cd ..
-      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
-      
-      - uses: ./.github/actions/setup-solana/
 
       - uses: actions/cache@v2
         name: Cache Cargo registry + index
