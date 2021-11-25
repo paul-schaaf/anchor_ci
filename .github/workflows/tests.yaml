@@ -22,10 +22,9 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
-      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
       - uses: actions/cache@v2
         name: Cache Cargo registry + index
-        id: cache-anchor
+        id: cache-cargo-build
         with:
           path: |
             ~/.cargo/bin/
@@ -33,7 +32,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./target/
-          key: cargo-${{ runner.os }}-core-tests-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ runner.os }}-cargo-build-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo build
       - run: cargo fmt -- --check
       - run: cargo clippy --all-targets -- -D warnings
@@ -59,7 +58,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./target/
-          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ runner.os }}-anchor-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo install --path cli anchor-cli --locked --force
       - uses: actions/upload-artifact@v2
         with:
@@ -246,7 +245,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./target/
-          key: cargo-${{ runner.os }}-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ runner.os }}-anchor-${{ hashFiles('**/Cargo.lock') }}
 
       - uses: actions/download-artifact@v2
         with:
