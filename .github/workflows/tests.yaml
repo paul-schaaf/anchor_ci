@@ -12,7 +12,37 @@ env:
   NODE_VERSION: 17.0.1
 
 jobs:
-  setup:
+  test-core:
+    name: Core Tests
+    runs-on: ubuntu-18.04
+    steps:
+      - run: rustup component add rustfmt clippy
+      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
+      - uses: actions/checkout@v2
+      - run: git submodule update --init --recursive
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
+      - uses: actions/cache@v2
+        name: Cache Cargo registry + index
+        id: cache-anchor
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./target/
+          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
+      - run: cargo build
+      - run: cargo fmt -- --check
+      - run: cargo clippy --all-targets -- -D warnings
+      - run: cargo test
+      - run: pushd ts && yarn && popd
+      - run: pushd ts && yarn test && popd
+      - run: pushd ts && yarn lint && popd
+  setup-program-tests:
     name: Setup Program Tests
     runs-on: ubuntu-18.04
     steps:
@@ -36,7 +66,7 @@ jobs:
           path: ~/.cargo/bin/anchor
 
   test:
-    needs: setup
+    needs: setup-program-tests
     name: Test ${{ matrix.node.path }}
     runs-on: ubuntu-18.04
     strategy:
