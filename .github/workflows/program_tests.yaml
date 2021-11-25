@@ -1,0 +1,98 @@
+name: Program Tests
+
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+env: 
+  SOLANA_CLI_VERSION: 1.8.0
+  NODE_VERSION: 17.0.1
+
+jobs:
+  test:
+    runs-on: ubuntu-18.04
+    strategy:
+      matrix:
+        node:
+          - cmd: pushd client/example && ./run-test.sh && popd
+            name: client
+            nocache: true
+          - cmd: pushd tests/sysvars && anchor test && popd
+            name: sysvars
+          - cmd: pushd tests/composite && anchor test && popd
+            name: composite
+          - cmd: pushd tests/errors && anchor test && popd
+            name: errors
+          - cmd: pushd tests/spl/token-proxy && anchor test && popd
+            name: spl/token-proxy
+          - cmd: pushd tests/multisig && anchor test && popd
+            name: multisig
+          - cmd: pushd tests/interface && anchor test && popd
+            name: interface
+          - cmd: pushd tests/lockup && anchor test && popd
+            name: lockup
+          - cmd: pushd tests/permissioned-markets/deps/serum-dex/dex && cargo build-bpf && cd ../../../ && anchor test && popd
+            name: permissioned-markets
+    steps:
+      - uses: actions/checkout@v2
+      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
+      - run: echo "${{ env.ANCHOR_VERSION }}"
+      - run: git submodule update --init --recursive
+
+      - uses: actions/setup-node@v2
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+
+      - run: rustup component add rustfmt clippy
+      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
+      - uses: actions/cache@v2
+        name: Cache Typescript node_modules
+        id: cache-typescript
+        with:
+          path: |
+            ./ts/node_modules
+          key: solana-${{ runner.os }}-v0000-${{ env.NODE_VERSION }}-${{ hashFiles('**/yarn.lock') }}
+      - run: cd ts && yarn && yarn build && yarn link && cd ../
+      - run: cd examples/tutorial && yarn link @project-serum/anchor && yarn && cd ../../
+      - run: cd tests && yarn link @project-serum/anchor && yarn && cd ..
+      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
+      - uses: actions/cache@v2
+        name: Cache Solana Tool Suite
+        id: cache-solana
+        with:
+          path: |
+            ~/.cache/solana/
+            ~/.local/share/solana/
+          key: solana-${{ runner.os }}-v0000-${{ env.SOLANA_CLI_VERSION }}
+      - run: sh -c "$(curl -sSfL https://release.solana.com/v${{ env.SOLANA_CLI_VERSION }}/install)"
+      - run: echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
+
+      - run: yes | solana-keygen new
+
+      - uses: actions/cache@v2
+        name: Cache Cargo registry + index
+        id: cache-anchor
+        with:
+          path: |
+            ~/.cargo/bin/
+            ~/.cargo/registry/index/
+            ~/.cargo/registry/cache/
+            ~/.cargo/git/db/
+            ./target/
+          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
+
+      - run: cargo install --path cli anchor-cli --locked --force
+
+      - uses: actions/cache@v2
+        name: Cache ${{ matrix.node.name }} target
+        if: ${{ matrix.node.nocache }} == ""
+        id: cache-test-target
+        with:
+          path: tests/${{ matrix.node.name }}/target
+          key: cargo-${{ runner.os }}-v0000-${{ matrix.node.name }}-${{ env.ANCHOR_VERSION }}
+      
+      - run: ${{ matrix.node.cmd }}
+        name: ${{ matrix.node.name }} program test
