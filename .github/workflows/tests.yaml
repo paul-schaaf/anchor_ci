@@ -49,7 +49,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install -y pkg-config build-essential libudev-dev
-      - uses: ./.github/actions/setup-solana/
       - uses: actions/cache@v2
         name: Cache Cargo registry + index
         id: cache-anchor
@@ -83,10 +82,7 @@ jobs:
           - path: tests/composite/
             name: composite.so
     steps:
-      - uses: actions/checkout@v2
-      - run: git submodule update --init --recursive
-      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
-
+      - uses: ./.github/actions/setup/
       - uses: ./.github/actions/setup-solana/
 
       - uses: actions/download-artifact@v2
@@ -105,10 +101,8 @@ jobs:
     name: Client Example Test
     runs-on: ubuntu-18.04
     steps:
-      - uses: actions/checkout@v2
-      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
-      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
-      - run: git submodule update --init --recursive
+      - uses: ./.github/actions/setup/
+
       - uses: actions/download-artifact@v2
         with:
           name: anchor-binary
@@ -186,16 +180,13 @@ jobs:
           - cmd: pushd tests/cfo && anchor run test-with-build && popd
             path: tests/cfo
     steps:
-      - uses: actions/checkout@v2
-      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
-      - run: git submodule update --init --recursive
+      - uses: ./.github/actions/setup/
 
       - uses: actions/setup-node@v2
         with:
           node-version: ${{ env.NODE_VERSION }}
 
       - run: rustup component add rustfmt clippy
-      - run: sudo apt-get install -y pkg-config build-essential libudev-dev
       - uses: actions/cache@v2
         name: Cache Typescript node_modules
         id: cache-typescript
