@@ -15,8 +15,5 @@ runs:
         shell: bash
       - run: echo "/home/runner/.local/share/solana/install/active_release/bin" >> $GITHUB_PATH
         shell: bash
-      - run: yes | solana-keygen new
+      - run: solana-keygen new --no-bip39-passphrase
         shell: bash
-      - run: echo "action complete"
-        shell: bash
-        
