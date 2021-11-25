@@ -17,3 +17,6 @@ runs:
         shell: bash
       - run: yes | solana-keygen new
         shell: bash
+      - run: echo "action complete"
+        shell: bash
+        
