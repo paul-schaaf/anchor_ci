@@ -76,6 +76,7 @@ jobs:
         with:
           name: anchor-binary
           path: ~/.cargo/bin/
+      - run: chmod +rwx ~/.cargo/bin/anchor
       - uses: ./.github/actions/setup/
       - uses: ./.github/actions/setup-solana/
       - uses: ./.github/actions/setup-ts/
