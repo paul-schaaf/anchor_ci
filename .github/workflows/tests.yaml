@@ -1,4 +1,4 @@
-name: Program Tests
+name: Tests
 
 on:
   push:
@@ -34,7 +34,7 @@ jobs:
             ~/.cargo/registry/cache/
             ~/.cargo/git/db/
             ./target/
-          key: cargo-${{ runner.os }}-v0000-${{ hashFiles('**/Cargo.lock') }}
+          key: cargo-${{ runner.os }}-core-tests-${{ hashFiles('**/Cargo.lock') }}
       - run: cargo build
       - run: cargo fmt -- --check
       - run: cargo clippy --all-targets -- -D warnings
