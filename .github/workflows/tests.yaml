@@ -72,6 +72,8 @@ jobs:
     strategy:
       matrix:
         node:
+          - cmd: pushd client/example && ./run-test.sh && popd
+            path: client/example
           - cmd: pushd tests/sysvars && anchor test && popd
             path: tests/sysvars
           - cmd: pushd tests/composite && anchor test && popd
