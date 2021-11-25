@@ -50,7 +50,7 @@ jobs:
     strategy:
       matrix:
         node:
-          - path: tests/events
+          - path: tests/events/
             name: events.so
           - path: examples/tutorial/basic-4/
             name: basic_4.so
@@ -80,7 +80,7 @@ jobs:
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.node.name }}
-          path: ${{ matrix.node.path }}/target/deploy${{ matrix.node.name }}
+          path: ${{ matrix.node.path }}target/deploy/${{ matrix.node.name }}
   
   test-client-example:
     needs: setup-client-example
