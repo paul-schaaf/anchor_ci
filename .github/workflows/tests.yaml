@@ -67,6 +67,7 @@ jobs:
           path: ~/.cargo/bin/anchor
 
   test-examples:
+    needs: setup-anchor-cli
     name: Examples Test
     runs-on: ubuntu-18.04
     steps:
@@ -75,7 +76,6 @@ jobs:
       - uses: ./.github/actions/setup-solana/
       - uses: ./.github/actions/setup-ts/
       - run: pushd examples/tutorial && yarn workspaces run test
-
 
   setup-client-example:
     needs: setup-anchor-cli
