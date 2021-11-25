@@ -10,12 +10,11 @@ on:
 env: 
   SOLANA_CLI_VERSION: 1.8.0
   NODE_VERSION: 17.0.1
-  OS_VERSION: ubuntu-18.04
 
 jobs:
   test-core:
     name: Core Tests
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-18.04
     steps:
       - run: rustup component add rustfmt clippy
       - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
@@ -46,7 +45,7 @@ jobs:
 
   setup-client-example:
     name: Setup Client Example Test
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         node:
@@ -68,7 +67,7 @@ jobs:
   test-client-example:
     needs: setup-client-example
     name: Client Example Test
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/download-artifact@v2
         with:
@@ -96,7 +95,7 @@ jobs:
 
   setup-program-tests:
     name: Setup Program Tests
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v2
       - run: sudo apt-get install -y pkg-config build-essential libudev-dev
@@ -120,7 +119,7 @@ jobs:
   test-programs:
     needs: setup-program-tests
     name: Test ${{ matrix.node.path }}
-    runs-on: ${{ env.OS_VERSION }}
+    runs-on: ubuntu-18.04
     strategy:
       matrix:
         node:
