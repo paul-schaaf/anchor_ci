@@ -60,13 +60,12 @@ jobs:
             name: composite.so
     steps:
       - uses: actions/checkout@v2
-      - run: echo "ANCHOR_VERSION=$(cat ./VERSION)" >> $GITHUB_ENV
       - run: git submodule update --init --recursive
       - uses: actions/download-artifact@v2
         with:
           name: anchor-binary
           path: ~/.cargo/bin/
-      - run: pushd ${{ matrix.node.path }} && anchor build && popd
+      - run: pushd ${{ matrix.node.path }} && sudo anchor build && popd
       - uses: actions/upload-artifact@v2
         with:
           name: ${{ matrix.node.name }}
