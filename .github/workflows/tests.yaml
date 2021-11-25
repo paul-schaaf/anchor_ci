@@ -66,14 +66,16 @@ jobs:
           name: anchor-binary
           path: ~/.cargo/bin/anchor
 
-  # test-examples:
-  #   name: Examples Test
-  #   runs-on: ubuntu-18.04
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - uses: ./.github/actions/setup/
-  #     - uses: ./.github/actions/setup-solana/
-  #     - uses: ./.github/actions/setup-ts/
+  test-examples:
+    name: Examples Test
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v2
+      - uses: ./.github/actions/setup/
+      - uses: ./.github/actions/setup-solana/
+      - uses: ./.github/actions/setup-ts/
+      - run: pushd examples/tutorial && yarn workspaces run test
+
 
   setup-client-example:
     needs: setup-anchor-cli
